@@ -10,11 +10,12 @@ export interface MemoryProfileOutput {
   useModuleOffset: boolean;
   moduleName: string;
   offset: string;
-  offsets: string[];
+  offsets?: string[];
   bitmask: string;
-  bitwiseOp: string;
+  bitwiseOp: "" | "AND" | "OR" | "XOR" | "NOT";
   bitfield: boolean;
   isPointerChain: boolean;
+  source?: "user" | "profile" | "community";
 }
 
 export interface MemoryProfile {
@@ -25,5 +26,6 @@ export interface MemoryProfile {
   outputs: MemoryProfileOutput[];
   lastModified: number;
   outputCount: number;
-  memoryProfileType: 'user' | 'community' | 'profile';
+  memoryProfileType: 'user' | 'community' | 'profile' | 'default';
+  content?: string;
 }
