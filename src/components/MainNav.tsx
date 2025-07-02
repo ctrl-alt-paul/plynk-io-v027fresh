@@ -1,3 +1,4 @@
+
 import { MemoryStick, CpuIcon, Gamepad2, Activity, FileText, MessageSquare, Info, Github } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -18,25 +19,16 @@ import { AboutDialog } from "@/components/AboutDialog";
 import { useState } from "react";
 import { useMessageAttachment } from "@/contexts/MessageAttachmentContext";
 import { useGitHubAuth } from "@/state/githubAuthStore";
-import { GitHubDeviceDialog } from "@/components/GitHubDeviceDialog";
 import { cn } from "@/lib/utils";
 
 export function MainNav() {
   const [showAbout, setShowAbout] = useState(false);
-  const [showGitHubDialog, setShowGitHubDialog] = useState(false);
   const { isGameProfileActive } = useMessageAttachment();
   const location = useLocation();
   const { 
     isAuthenticated, 
     user, 
-    isConnecting, 
-    isCheckingStatus,
-    deviceFlow, 
-    error,
-    startAuthentication, 
-    cancelAuthentication,
-    checkAuthStatus,
-    logout 
+    error
   } = useGitHubAuth();
 
   // Handle external links
@@ -53,7 +45,7 @@ export function MainNav() {
     const currentPath = location.pathname;
     
     // Handle root route - both "/" and "/dashboard" should highlight Dashboard
-    if (href === "/dashboard") {
+    if (href === "/") {
       return currentPath === "/" || currentPath === "/dashboard";
     }
     
@@ -65,15 +57,9 @@ export function MainNav() {
 
   // GitHub icon color based on connection status
   const getGitHubIconColor = () => {
-    if (isConnecting) return "text-blue-400";
     if (isAuthenticated) return "text-green-500";
     if (error) return "text-red-500";
     return "text-gray-400";
-  };
-
-  const handleConnectGitHub = async () => {
-    setShowGitHubDialog(true);
-    await startAuthentication();
   };
 
   const handleViewRepositories = () => {
@@ -83,13 +69,12 @@ export function MainNav() {
   };
 
   const navItems = [
-    { name: "Dashboard", path: "/" },
-    { name: "Memory Manager", path: "/memory-manager" },
-    { name: "Game Profiles", path: "/game-profiles" },
-    { name: "Message Monitor", path: "/message-monitor" },
-    { name: "Device Manager", path: "/device-manager" },
-    { name: "WLED Manager", path: "/wled-manager" },
-    { name: "Community", path: "/community-profiles" },
+    { name: "Dashboard", path: "/", icon: Activity },
+    { name: "Memory Manager", path: "/memory-manager", icon: MemoryStick },
+    { name: "Game Manager", path: "/game-manager", icon: Gamepad2 },
+    { name: "Message Monitor", path: "/message-monitor", icon: MessageSquare },
+    { name: "Device Manager", path: "/device-manager", icon: CpuIcon },
+    { name: "WLED Manager", path: "/wled-manager", icon: Activity },
   ];
 
   return (
@@ -160,13 +145,9 @@ export function MainNav() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-gray-800 border shadow-lg">
               {!isAuthenticated ? (
-                <DropdownMenuItem 
-                  onClick={handleConnectGitHub}
-                  disabled={isConnecting}
-                  className="cursor-pointer"
-                >
+                <DropdownMenuItem className="cursor-pointer">
                   <Github className="mr-2 h-4 w-4" />
-                  {isConnecting ? 'Connecting...' : 'Connect GitHub'}
+                  Connect GitHub
                 </DropdownMenuItem>
               ) : (
                 <>
@@ -177,10 +158,7 @@ export function MainNav() {
                     <Github className="mr-2 h-4 w-4" />
                     View My Repositories
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={logout}
-                    className="cursor-pointer text-red-600 dark:text-red-400"
-                  >
+                  <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400">
                     Disconnect GitHub
                   </DropdownMenuItem>
                   {user && (
@@ -210,22 +188,6 @@ export function MainNav() {
         trigger={<div />}
         open={showAbout}
         onOpenChange={setShowAbout}
-      />
-
-      <GitHubDeviceDialog
-        open={showGitHubDialog}
-        onOpenChange={setShowGitHubDialog}
-        userCode={deviceFlow?.user_code || ''}
-        verificationUri={deviceFlow?.verification_uri || 'https://github.com/login/device'}
-        isPolling={isConnecting}
-        isCheckingStatus={isCheckingStatus}
-        isConnected={isAuthenticated}
-        connectedUser={user}
-        onCancel={() => {
-          cancelAuthentication();
-          setShowGitHubDialog(false);
-        }}
-        onCheckStatus={checkAuthStatus}
       />
     </div>
   );
