@@ -12,9 +12,10 @@ export interface MemoryProfileOutput {
   offset: string;
   offsets: string[];
   bitmask: string;
-  bitwiseOp: string;
+  bitwiseOp: "" | "AND" | "OR" | "XOR" | "NOT";
   bitfield: boolean;
   isPointerChain: boolean;
+  source?: "user" | "community" | "profile";
 }
 
 export interface MemoryProfile {

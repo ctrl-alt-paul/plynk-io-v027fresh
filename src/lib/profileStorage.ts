@@ -321,7 +321,7 @@ export const profileStorage = {
       offset: address.offset || "",
       offsets: address.offsets || [],
       bitmask: address.bitmask || "",
-      bitwiseOp: address.bitwiseOp || "",
+      bitwiseOp: (address.bitwiseOp as "" | "AND" | "OR" | "XOR" | "NOT") || "",
       bitfield: address.bitfield || false,
       isPointerChain: address.isPointerChain || false,
       source: address.source || "user" // Preserve source field
