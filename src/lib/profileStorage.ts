@@ -1,3 +1,4 @@
+
 import { GameProfile } from "@/types/profiles";
 import { isElectron } from "@/utils/isElectron";
 import { MemoryAddress } from "@/types/memoryAddress";
@@ -300,7 +301,7 @@ export const profileStorage = {
       isPointerChain: output.isPointerChain || false,
       disableCaching: false,
       fastModeEnabled: false,
-      source: (output.source as "user" | "profile" | "community") || "profile"
+      source: (output.source === "community" ? "profile" : output.source) as "user" | "profile"
     };
   },
 
