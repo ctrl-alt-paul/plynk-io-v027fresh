@@ -15,7 +15,7 @@ export interface MemoryProfileOutput {
   bitwiseOp: "" | "AND" | "OR" | "XOR" | "NOT";
   bitfield: boolean;
   isPointerChain: boolean;
-  source?: "user" | "community" | "profile";
+  source?: "user" | "community" | "default";
 }
 
 export interface MemoryProfile {
@@ -26,5 +26,5 @@ export interface MemoryProfile {
   outputs: MemoryProfileOutput[];
   lastModified: number;
   outputCount: number;
-  memoryProfileType: 'user' | 'community' | 'profile';
+  memoryProfileType: 'user' | 'community' | 'default';
 }

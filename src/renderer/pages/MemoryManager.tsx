@@ -322,7 +322,7 @@ const MemoryManagerContent = () => {
               isLoading={memoryReader.isLoading}
               isSaving={profileManager.isSaving}
               selectedProcess={selectedProcess}
-              onProfileSelect={(profileName, profileType: 'user' | 'community' | 'profile') => {
+              onProfileSelect={(profileName, profileType: 'default' | 'user' | 'community') => {
                 // Clear original addresses when switching profiles
                 addressManager.clearOriginalAddresses();
                 profileManager.loadMemoryProfile(profileName, profileType);
@@ -476,7 +476,7 @@ const MemoryManagerContent = () => {
                   fetchProcesses={fetchProcesses}
                   setPollInterval={memoryReader.setPollInterval}
                   startPolling={() => memoryReader.handleStartPolling(selectedProcess, addressManager.memoryAddresses)}
-                  stopPolling={memoryReader.handleStopPolling}
+                  stopPolling={() => memoryReader.handleStopPolling}
                   readMemory={() => memoryReader.readMemory(selectedProcess, addressManager.memoryAddresses)}
                   onProcessChange={setSelectedProcess}
                   currentProfileName={profileManager.currentProfileName}

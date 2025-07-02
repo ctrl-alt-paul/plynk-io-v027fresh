@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -68,7 +69,7 @@ export function MemoryProfileSubmissionDialog({
         memoryProfileType: 'user' as const
       };
 
-      const result = await GitHubSubmissionService.submitMemoryProfile({
+      const result = await GitHubSubmissionService.submitProfile({
         title,
         description,
         profile: profileToSubmit,
