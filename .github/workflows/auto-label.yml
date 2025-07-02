@@ -4,25 +4,40 @@ on:
     types: [opened, reopened, edited]
 
 permissions:
-  issues: write            # lets the workflow add labels
+  issues: write
 
 jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v7
+      - name: Parse requested labels
+        id: parse
+        uses: actions/github-script@v7
         with:
           script: |
-            // 1. read the hidden line
             const body  = context.payload.issue.body || '';
             const match = body.match(/PLYNK-LABELS:\s*([^\-]*)/i);
             const labels = match ? match[1].split(',').map(l => l.trim()) : [];
 
-            // 2. add them
+            // keep only repo-existing labels (optional safety)
+            const { data: repoLabels } = await github.rest.issues.listLabelsForRepo(context.repo);
+            const allowed = new Set(repoLabels.map(l => l.name));
+            const final   = labels.filter(l => allowed.has(l));
+
+            core.setOutput('labels', JSON.stringify(final));
+
+      - name: Apply labels
+        if: steps.parse.outputs.labels != '[]'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = JSON.parse(process.env.LABELS);
             if (labels.length) {
-              await github.issues.addLabels({
+              await github.rest.issues.addLabels({
                 ...context.repo,
                 issue_number: context.payload.issue.number,
                 labels
               });
             }
+        env:
+          LABELS: ${{ steps.parse.outputs.labels }}
