@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { MemoryStick, RefreshCw, HelpCircle, FileEdit, Upload, Users } from "lucide-react";
+import { MemoryStick, RefreshCw, HelpCircle, FileEdit, Upload } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,6 @@ import { profileStorage } from "@/lib/profileStorage";
 import { UnsavedChangesProvider } from "@/components/UnsavedChangesProvider";
 import { UnsavedChangesWarning } from "@/components/UnsavedChangesWarning";
 import { MemoryProfileSubmissionDialog } from '@/components/MemoryProfileSubmissionDialog';
-import { CommunityProfilesModal } from '@/components/community/CommunityProfilesModal';
 import { useGitHubAuth } from '@/state/githubAuthStore';
 
 // Import the refactored components
@@ -44,15 +43,12 @@ const MemoryManagerContent = () => {
   // Add submission dialog state
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false);
   
-  // Add community profiles modal state
-  const [showCommunityModal, setShowCommunityModal] = useState(false);
-  
   const {
     focusedMemoryProfile,
     clearFocus
   } = useProfileNavigation();
   
-  // Add GitHub auth hook
+  // Add GitHub auth hook - FIXED: Using isAuthenticated instead of isConnected
   const { isAuthenticated } = useGitHubAuth();
   
   // New state for JSON editing modal
@@ -273,28 +269,7 @@ const MemoryManagerContent = () => {
               } 
             />
             
-            {/* Browse Community Profiles Button */}
-            <Button
-              onClick={() => {
-                if (!isAuthenticated) {
-                  toast.error('Please connect to GitHub to browse community profiles');
-                  return;
-                }
-                setShowCommunityModal(true);
-              }}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Browse Community Profiles
-              {!isAuthenticated && (
-                <Badge variant="secondary" className="text-xs">
-                  GitHub Required
-                </Badge>
-              )}
-            </Button>
-            
-            {/* Add Submission Button */}
+            {/* Add Submission Button - FIXED: Using isAuthenticated instead of isConnected */}
             {hasUserOutputs && (
               <Button
                 onClick={() => setShowSubmissionDialog(true)}
@@ -504,12 +479,6 @@ const MemoryManagerContent = () => {
           />
         </div>
       </div>
-      
-      {/* Community Profiles Modal */}
-      <CommunityProfilesModal
-        open={showCommunityModal}
-        onOpenChange={setShowCommunityModal}
-      />
       
       {/* Update Submission Dialog - always render when there are user outputs */}
       {hasUserOutputs && (
