@@ -4,7 +4,7 @@ import { GitHubUser } from '@/state/githubAuthStore';
 
 // Hard-coded GitHub repository configuration
 const GITHUB_OWNER = 'ctrl-alt-paul';
-const GITHUB_REPO = 'plynk-io-v026fresh';
+const GITHUB_REPO = 'plynk-io-v027fresh';
 
 export interface SubmissionData {
   profile: MemoryProfile;
