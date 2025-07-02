@@ -11,8 +11,9 @@ export interface ElectronAPI {
   githubPollForToken: (deviceCode: string) => Promise<{ success: boolean; token?: string; error?: string }>;
   githubValidateToken: (token: string) => Promise<{ success: boolean; user?: any; error?: string }>;
   githubCreateIssue: (owner: string, repo: string, issueData: { title: string; body: string; labels: string[] }, token: string) => Promise<{ success: boolean; issueUrl?: string; issueNumber?: number; error?: string }>;
+  githubCheckAuthStatus: (deviceCode: string) => Promise<{ success: boolean; token?: string; error?: string; pending?: boolean }>;
   
-  // NEW: Community profiles methods
+  // Community profiles methods
   githubListIssues: (owner: string, repo: string, options?: { page?: number; per_page?: number; labels?: string; state?: string; sort?: string; direction?: string }, token: string) => Promise<{ success: boolean; issues?: any[]; error?: string }>;
   githubGetIssue: (owner: string, repo: string, issueNumber: number, token: string) => Promise<{ success: boolean; issue?: any; error?: string }>;
   githubListComments: (owner: string, repo: string, issueNumber: number, token: string) => Promise<{ success: boolean; comments?: any[]; error?: string }>;
