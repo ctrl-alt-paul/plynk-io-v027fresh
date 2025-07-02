@@ -1,0 +1,43 @@
+name: Auto-label PLYNK submissions1
+on:
+  issues:
+    types: [opened, reopened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Parse requested labels
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body  = context.payload.issue.body || '';
+            const match = body.match(/PLYNK-LABELS:\s*([^\-]*)/i);
+            const labels = match ? match[1].split(',').map(l => l.trim()) : [];
+
+            // keep only repo-existing labels (optional safety)
+            const { data: repoLabels } = await github.rest.issues.listLabelsForRepo(context.repo);
+            const allowed = new Set(repoLabels.map(l => l.name));
+            const final   = labels.filter(l => allowed.has(l));
+
+            core.setOutput('labels', JSON.stringify(final));
+
+      - name: Apply labels
+        if: steps.parse.outputs.labels != '[]'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = JSON.parse(process.env.LABELS);
+            if (labels.length) {
+              await github.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: context.payload.issue.number,
+                labels
+              });
+            }
+        env:
+          LABELS: ${{ steps.parse.outputs.labels }}
