@@ -292,7 +292,7 @@ export const syncGameProfilesToMemoryProfile = async (memoryProfile: MemoryProfi
             offset: matchingMemoryOutput.offset,
             offsets: matchingMemoryOutput.offsets || output.offsets || [],
             bitmask: matchingMemoryOutput.bitmask,
-            bitwiseOp: (matchingMemoryOutput.bitwiseOp as "" | "AND" | "OR" | "XOR" | "NOT") || "",
+            bitwiseOp: matchingMemoryOutput.bitwiseOp,
             bitfield: matchingMemoryOutput.bitfield,
             isPointerChain: matchingMemoryOutput.isPointerChain,
             // Formatting/display properties
@@ -328,7 +328,7 @@ export const syncGameProfilesToMemoryProfile = async (memoryProfile: MemoryProfi
           offset: memOutput.offset,
           offsets: memOutput.offsets || [],
           bitmask: memOutput.bitmask,
-          bitwiseOp: (memOutput.bitwiseOp as "" | "AND" | "OR" | "XOR" | "NOT") || "",
+          bitwiseOp: memOutput.bitwiseOp,
           bitfield: memOutput.bitfield,
           isPointerChain: memOutput.isPointerChain,
           lastSyncedWithMemory: Date.now()
@@ -572,6 +572,10 @@ export const syncMemoryProfileToGameProfile = (
           memOutput.script !== matchingGameOutput.script;
         
         if (needsUpdate) {
+          //console.log(`Updating memory output '${memOutput.label}' from game profile`);
+          //console.log(`Before: invert=${memOutput.invert}, format=${memOutput.format}, script=${memOutput.script || ''}`);
+          //console.log(`After: invert=${matchingGameOutput.invert}, format=${matchingGameOutput.format}, script=${matchingGameOutput.script || ''}`);
+          
           hasChanges = true;
           return {
             ...memOutput,
@@ -592,25 +596,26 @@ export const syncMemoryProfileToGameProfile = (
         lastModified: Date.now() // Add timestamp of last modification
       };
       
-      // Update the content string to reflect the changes if it exists
-      if (memoryProfile.content) {
-        const contentObj = JSON.parse(memoryProfile.content || "{}");
-        contentObj.outputs = updatedOutputs.map(output => ({
-          ...output,
-          address: output.address.replace(/^.*\+/, "") // Strip module prefix if any
-        }));
-        
-        updatedMemoryProfile.content = JSON.stringify(contentObj, null, 2);
-      }
+      // Update the content string to reflect the changes
+      const contentObj = JSON.parse(memoryProfile.content || "{}");
+      contentObj.outputs = updatedOutputs.map(output => ({
+        ...output,
+        address: output.address.replace(/^.*\+/, "") // Strip module prefix if any
+      }));
+      
+      updatedMemoryProfile.content = JSON.stringify(contentObj, null, 2);
       
       // Save the updated memory profile to the cache
       profileStorage.updateCachedMemoryProfile(updatedMemoryProfile);
       
+      //console.log(`Memory profile ${memoryProfile.fileName} updated successfully`);
       return updatedMemoryProfile;
     }
     
+    //console.log(`No changes needed for memory profile ${memoryProfile.fileName}`);
     return null; // No changes were made
   } catch (error) {
+    //console.error("Failed to sync memory profile to game profile:", error);
     toast(`Failed to sync memory profile to game profile: ${(error as Error).message}`);
     return null;
   }

@@ -295,12 +295,12 @@ export const profileStorage = {
       offsetFormat: "hex",
       offsets: output.offsets || [],
       bitmask: output.bitmask || "",
-      bitwiseOp: (output.bitwiseOp as "" | "AND" | "OR" | "XOR" | "NOT") || "",
+      bitwiseOp: output.bitwiseOp || "",
       bitfield: output.bitfield || false,
       isPointerChain: output.isPointerChain || false,
       disableCaching: false,
       fastModeEnabled: false,
-      source: (output.source as "user" | "profile" | "community") || "profile"
+      source: output.source || "profile" // Default to "profile" for loaded addresses
     };
   },
 
@@ -321,10 +321,10 @@ export const profileStorage = {
       offset: address.offset || "",
       offsets: address.offsets || [],
       bitmask: address.bitmask || "",
-      bitwiseOp: (address.bitwiseOp as "" | "AND" | "OR" | "XOR" | "NOT") || "",
+      bitwiseOp: address.bitwiseOp || "",
       bitfield: address.bitfield || false,
       isPointerChain: address.isPointerChain || false,
-      source: address.source as "user" | "profile" | "community"
+      source: address.source || "user" // Preserve source field
     };
   },
 

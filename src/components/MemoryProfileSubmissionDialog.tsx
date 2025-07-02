@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Upload, Github, CheckCircle, AlertCircle } from 'lucide-react';
 import {
@@ -74,8 +75,6 @@ export function MemoryProfileSubmissionDialog({
       process: process || '',
       pollInterval: pollInterval || 16,
       outputs: userOutputs,
-      lastModified: Date.now(),
-      outputCount: userOutputs.length,
       memoryProfileType: 'user' as const
     };
   }, [profile, process, pollInterval, userOutputs]);
