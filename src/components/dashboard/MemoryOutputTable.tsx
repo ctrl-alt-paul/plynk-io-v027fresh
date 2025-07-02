@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -20,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from 'sonner';
+import { useDebounce } from '@/hooks/useDebounce';
 import { MemoryAddress } from '@/types/memoryAddress';
 import { profileStorage } from '@/lib/profileStorage';
 import { MemoryProfile } from '@/types/memoryProfiles';
@@ -48,6 +48,17 @@ const DATA_TYPES = [
 
 export function MemoryOutputTable({ addresses, setAddresses, processName, pollInterval }: MemoryOutputTableProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+
+  const debouncedAddresses = useDebounce(addresses, 500);
+
+  useEffect(() => {
+    if (JSON.stringify(addresses) !== JSON.stringify(debouncedAddresses)) {
+      setIsDirty(true);
+    } else {
+      setIsDirty(false);
+    }
+  }, [addresses, debouncedAddresses]);
 
   const handleAddressChange = (id: string, field: string, value: any) => {
     setAddresses(prevAddresses =>
@@ -189,7 +200,7 @@ export function MemoryOutputTable({ addresses, setAddresses, processName, pollIn
       <div className="flex justify-between items-center mt-4">
         <Button onClick={handleAddAddress}>Add Address</Button>
         <div>
-          <Button onClick={handleSaveProfile} disabled={isSaving}>
+          <Button onClick={handleSaveProfile} disabled={!isDirty || isSaving}>
             {isSaving ? 'Saving...' : 'Save Profile'}
           </Button>
         </div>

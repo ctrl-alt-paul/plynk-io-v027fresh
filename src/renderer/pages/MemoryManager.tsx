@@ -247,6 +247,19 @@ const MemoryManagerContent = () => {
   const userOutputs = getUserCreatedOutputs();
   const hasUserOutputs = userOutputs.length > 0;
 
+  const handleSubmitToGitHub = () => {
+    const outputsToSubmit = addresses
+      .filter(addr => addr.source === 'user')
+      .map(addr => profileStorage.convertAddressToProfileOutput(addr));
+    
+    setSubmissionDialog({
+      isOpen: true,
+      process: processName,
+      pollInterval: pollInterval,
+      userOutputs: outputsToSubmit
+    });
+  };
+
   return (
     <div className="container mx-auto py-2">
       {/* Unsaved Changes Warning */}
@@ -488,7 +501,7 @@ const MemoryManagerContent = () => {
           profile={profileManager.currentProfile || undefined}
           process={selectedProcess || undefined}
           pollInterval={profileManager.defaultPollInterval}
-          userOutputs={userOutputs.map(addr => profileStorage.convertAddressToProfileOutput(addr))}
+          userOutputs={userOutputs}
         />
       )}
       
