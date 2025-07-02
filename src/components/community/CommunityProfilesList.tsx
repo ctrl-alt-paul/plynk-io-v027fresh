@@ -12,13 +12,20 @@ import { Search, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { GitHubCommunityService } from '@/services/githubCommunityService';
 import { CommunityProfileImporter } from '@/lib/communityProfileImporter';
+import { MemoryProfile } from '@/types/memoryProfiles';
 import {
   CommunityIssue,
   CommunityProfile,
   CommunityProfileFilters
 } from '@/types/communityProfiles';
 
-export const CommunityProfilesList: React.FC = () => {
+interface CommunityProfilesListProps {
+  onProfileImport?: (profile: MemoryProfile) => Promise<void>;
+}
+
+export const CommunityProfilesList: React.FC<CommunityProfilesListProps> = ({
+  onProfileImport
+}) => {
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<CommunityIssue[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<CommunityIssue[]>([]);
@@ -158,20 +165,39 @@ export const CommunityProfilesList: React.FC = () => {
         throw new Error('No valid profile data found in this submission');
       }
 
-      const result = await CommunityProfileImporter.importProfile(
-        profileJson,
-        profileToImport.gameName
-      );
-
-      if (result.success) {
-        toast({
-          title: "Profile Imported",
-          description: `"${profileToImport.gameName}" has been imported successfully.`
-        });
-        setShowDialog(false);
+      // If we have a custom import handler, use it
+      if (onProfileImport) {
+        // Convert to MemoryProfile format
+        const memoryProfile: MemoryProfile = {
+          id: `${profileToImport.gameName}.json`,
+          fileName: `${profileToImport.gameName}.json`,
+          process: profileJson.process,
+          pollInterval: profileJson.pollInterval || 16,
+          outputs: profileJson.outputs || [],
+          lastModified: Date.now(),
+          outputCount: profileJson.outputs?.length || 0,
+          memoryProfileType: 'community'
+        };
+        
+        await onProfileImport(memoryProfile);
       } else {
-        throw new Error(result.error || 'Import failed');
+        // Use the default importer
+        const result = await CommunityProfileImporter.importProfile(
+          profileJson,
+          profileToImport.gameName
+        );
+
+        if (result.success) {
+          toast({
+            title: "Profile Imported",
+            description: `"${profileToImport.gameName}" has been imported successfully.`
+          });
+        } else {
+          throw new Error(result.error || 'Import failed');
+        }
       }
+      
+      setShowDialog(false);
     } catch (error) {
       console.error('Error importing profile:', error);
       toast({
