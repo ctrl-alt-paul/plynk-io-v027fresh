@@ -146,6 +146,9 @@ export class GitHubSubmissionService {
       }))
     }, null, 2);
 
+    const labels = this.getGitHubLabels(submissionData.emulator);
+    const labelComment = `<!-- PLYNK-LABELS: ${labels.join(', ')} -->`;
+
     return `## Game Information
 **Game Name:** ${submissionData.gameName}
 **Game Version:** ${submissionData.gameVersion || 'N/A'}
@@ -174,7 +177,9 @@ ${profileJson}
 \`\`\`
 
 ---
-*This memory profile was submitted through PLYNK-IO and is pending verification.*`;
+*This memory profile was submitted through PLYNK-IO and is pending verification.*
+
+${labelComment}`;
   }
 
   static async submitProfile(submissionData: SubmissionData, user: GitHubUser): Promise<{ success: boolean; error?: string; issueUrl?: string }> {
