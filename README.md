@@ -1,7 +1,6 @@
-
 # 🎮 PLYNK-IO — Player Link Input Output
 
-[![Buy Me a Beer](https://github.com/ctrl-alt-paul/plynk-io-v027fresh/blob/main/buymeabeer.png)](https://buymeacoffee.com/ctrl_alt_paul)  
+[![Buy Me a Beer](https://github.com/ctrl-alt-paul/plynk-io-v025fresh/blob/main/buymeabeer.png)](https://buymeacoffee.com/ctrl_alt_paul)  
 [![Sponsor on GitHub](https://img.shields.io/badge/Sponsor%20on-GitHub-%23EA4AAA?logo=github)](https://github.com/sponsors/CtrlAltPaul)
 
 **PLYNK-IO** is a gloriously overengineered I/O control system for emulated arcade games. It hijacks game data in real time — from memory addresses to emulator broadcasts — and lets you fire it off to real-world devices like LEDs, serial devices, WLED devices, motors, solenoids, and anything else you can bolt to a cabinet.
