@@ -1,48 +1,91 @@
 
-import { create } from 'zustand';
-import { MemoryProfile } from '@/types/memoryProfiles';
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import { MemoryProfile, MemoryProfileOutput } from '@/types/memoryProfiles';
 
-interface MemoryProfileState {
+export interface MemoryProfileStoreState {
   currentProfile: MemoryProfile | null;
-  profiles: MemoryProfile[];
-  isLoading: boolean;
-  error: string | null;
-  setCurrentProfile: (profile: MemoryProfile | null) => void;
-  setProfiles: (profiles: MemoryProfile[]) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  addProfile: (profile: MemoryProfile) => void;
-  updateProfile: (profile: MemoryProfile) => void;
-  removeProfile: (profileId: string) => void;
+  submissionHistory: Array<{
+    profileId: string;
+    submittedAt: string;
+    issueUrl: string;
+    gameVersion: string;
+    emulator: string;
+  }>;
 }
 
-export const useMemoryProfileStore = create<MemoryProfileState>((set, get) => ({
-  currentProfile: null,
-  profiles: [],
-  isLoading: false,
-  error: null,
-  
-  setCurrentProfile: (profile) => set({ currentProfile: profile }),
-  
-  setProfiles: (profiles) => set({ profiles }),
-  
-  setLoading: (loading) => set({ isLoading: loading }),
-  
-  setError: (error) => set({ error }),
-  
-  addProfile: (profile) => set((state) => ({
-    profiles: [...state.profiles, profile]
-  })),
-  
-  updateProfile: (profile) => set((state) => ({
-    profiles: state.profiles.map(p => 
-      p.id === profile.id ? profile : p
-    ),
-    currentProfile: state.currentProfile?.id === profile.id ? profile : state.currentProfile
-  })),
-  
-  removeProfile: (profileId) => set((state) => ({
-    profiles: state.profiles.filter(p => p.id !== profileId),
-    currentProfile: state.currentProfile?.id === profileId ? null : state.currentProfile
-  }))
-}));
+export interface MemoryProfileStoreContextType extends MemoryProfileStoreState {
+  setCurrentProfile: (profile: MemoryProfile | null) => void;
+  getUserCreatedOutputs: () => MemoryProfileOutput[];
+  addSubmissionToHistory: (submission: {
+    profileId: string;
+    submittedAt: string;
+    issueUrl: string;
+    gameVersion: string;
+    emulator: string;
+  }) => void;
+  clearSubmissionHistory: () => void;
+}
+
+const MemoryProfileStoreContext = createContext<MemoryProfileStoreContextType | undefined>(undefined);
+
+export const MemoryProfileStoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [state, setState] = useState<MemoryProfileStoreState>({
+    currentProfile: null,
+    submissionHistory: []
+  });
+
+  const setCurrentProfile = useCallback((profile: MemoryProfile | null) => {
+    setState(prev => ({
+      ...prev,
+      currentProfile: profile
+    }));
+  }, []);
+
+  const getUserCreatedOutputs = useCallback((): MemoryProfileOutput[] => {
+    if (!state.currentProfile) return [];
+    
+    return state.currentProfile.outputs.filter(output => output.source === 'user');
+  }, [state.currentProfile]);
+
+  const addSubmissionToHistory = useCallback((submission: {
+    profileId: string;
+    submittedAt: string;
+    issueUrl: string;
+    gameVersion: string;
+    emulator: string;
+  }) => {
+    setState(prev => ({
+      ...prev,
+      submissionHistory: [submission, ...prev.submissionHistory]
+    }));
+  }, []);
+
+  const clearSubmissionHistory = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      submissionHistory: []
+    }));
+  }, []);
+
+  const value: MemoryProfileStoreContextType = {
+    ...state,
+    setCurrentProfile,
+    getUserCreatedOutputs,
+    addSubmissionToHistory,
+    clearSubmissionHistory
+  };
+
+  return (
+    <MemoryProfileStoreContext.Provider value={value}>
+      {children}
+    </MemoryProfileStoreContext.Provider>
+  );
+};
+
+export const useMemoryProfileStore = (): MemoryProfileStoreContextType => {
+  const context = useContext(MemoryProfileStoreContext);
+  if (context === undefined) {
+    throw new Error('useMemoryProfileStore must be used within a MemoryProfileStoreProvider');
+  }
+  return context;
+};

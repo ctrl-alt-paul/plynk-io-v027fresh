@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { MemoryStick, RefreshCw, HelpCircle, FileEdit, Upload, Users } from "lucide-react";
+import { MemoryStick, RefreshCw, HelpCircle, FileEdit, Upload } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,7 +13,6 @@ import { profileStorage } from "@/lib/profileStorage";
 import { UnsavedChangesProvider } from "@/components/UnsavedChangesProvider";
 import { UnsavedChangesWarning } from "@/components/UnsavedChangesWarning";
 import { MemoryProfileSubmissionDialog } from '@/components/MemoryProfileSubmissionDialog';
-import { CommunityProfilesModal } from '@/components/community/CommunityProfilesModal';
 import { useGitHubAuth } from '@/state/githubAuthStore';
 
 // Import the refactored components
@@ -45,15 +43,12 @@ const MemoryManagerContent = () => {
   // Add submission dialog state
   const [showSubmissionDialog, setShowSubmissionDialog] = useState(false);
   
-  // Add community profiles modal state
-  const [showCommunityModal, setShowCommunityModal] = useState(false);
-  
   const {
     focusedMemoryProfile,
     clearFocus
   } = useProfileNavigation();
   
-  // Add GitHub auth hook
+  // Add GitHub auth hook - FIXED: Using isAuthenticated instead of isConnected
   const { isAuthenticated } = useGitHubAuth();
   
   // New state for JSON editing modal
@@ -243,33 +238,6 @@ const MemoryManagerContent = () => {
     }
   };
 
-  // Handle community profile import
-  const handleCommunityProfileImport = async (profile: MemoryProfile) => {
-    try {
-      // Clear existing addresses and load the imported profile
-      addressManager.setMemoryAddresses([]);
-      
-      // Convert profile outputs to memory addresses
-      const memoryAddresses = profile.outputs.map(output => 
-        profileStorage.convertProfileOutputToAddress(output)
-      );
-      
-      // Set the imported data
-      addressManager.setMemoryAddresses(memoryAddresses);
-      setSelectedProcess(profile.process);
-      profileManager.setDefaultPollInterval(profile.pollInterval);
-      memoryReader.setPollInterval(profile.pollInterval);
-      
-      // Close the modal
-      setShowCommunityModal(false);
-      
-      toast.success(`Imported community profile: ${profile.fileName}`);
-    } catch (error) {
-      console.error('Error importing community profile:', error);
-      toast.error('Failed to import community profile');
-    }
-  };
-
   // Add function to get user-created outputs
   const getUserCreatedOutputs = () => {
     return addressManager.memoryAddresses.filter(addr => addr.source === 'user');
@@ -301,19 +269,7 @@ const MemoryManagerContent = () => {
               } 
             />
             
-            {/* Browse Community Profiles Button */}
-            {isAuthenticated && (
-              <Button
-                onClick={() => setShowCommunityModal(true)}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Users className="h-4 w-4" />
-                Browse Community Profiles
-              </Button>
-            )}
-            
-            {/* Add Submission Button */}
+            {/* Add Submission Button - FIXED: Using isAuthenticated instead of isConnected */}
             {hasUserOutputs && (
               <Button
                 onClick={() => setShowSubmissionDialog(true)}
@@ -535,13 +491,6 @@ const MemoryManagerContent = () => {
           userOutputs={userOutputs}
         />
       )}
-      
-      {/* Community Profiles Modal */}
-      <CommunityProfilesModal
-        open={showCommunityModal}
-        onOpenChange={setShowCommunityModal}
-        onProfileImport={handleCommunityProfileImport}
-      />
       
       {/* JSON Editor Dialog */}
       <JsonEditorDialog
