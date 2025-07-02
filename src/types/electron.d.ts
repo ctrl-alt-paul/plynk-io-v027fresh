@@ -1,3 +1,4 @@
+
 export interface Process {
   name: string;
   pid: number;
@@ -33,6 +34,32 @@ declare global {
       githubValidateToken?: (token: string) => Promise<{ success: boolean; user?: any; error?: string }>;
       githubCreateIssue?: (owner: string, repo: string, issueData: any, token: string) => Promise<{ success: boolean; issueUrl?: string; issueNumber?: number; error?: string }>;
       githubValidateLabels?: (owner: string, repo: string, labels: string[], token: string) => Promise<{ success: boolean; error?: string; missingLabels?: string[] }>;
+      
+      // Device methods
+      getPacDriveStatus?: () => Promise<any>;
+      listHidDevices?: () => Promise<any[]>;
+      getWLEDDeviceInfo?: (ipAddress: string) => Promise<any>;
+      getWLEDDeviceState?: (ipAddress: string) => Promise<any>;
+      testOutputDispatch?: (output: any) => Promise<{ success: boolean; error?: string }>;
+      
+      // Profile methods
+      getGameProfile?: (profileName: string) => Promise<{ success: boolean; profile?: any; error?: string }>;
+      getGameProfiles?: () => Promise<{ success: boolean; profiles?: string[]; error?: string }>;
+      getMemoryProfile?: (fileName: string) => Promise<{ success: boolean; profile?: any; error?: string }>;
+      
+      // Logging methods
+      getMasterLoggingConfig?: () => Promise<any>;
+      
+      // Platform property
+      platform?: NodeJS.Platform;
+      
+      // IPC Renderer for direct IPC communication
+      ipcRenderer?: {
+        invoke: (channel: string, ...args: any[]) => Promise<any>;
+        on: (channel: string, listener: (...args: any[]) => void) => void;
+        removeListener: (channel: string, listener: (...args: any[]) => void) => void;
+        removeAllListeners: (channel: string) => void;
+      };
     };
   }
 }
