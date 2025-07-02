@@ -1,4 +1,3 @@
-
 import { MemoryStick, CpuIcon, Gamepad2, Activity, FileText, MessageSquare, Info, Github } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -83,42 +82,14 @@ export function MainNav() {
     }
   };
 
-  const routes = [
-    {
-      title: "Dashboard",
-      href: "/dashboard",
-      icon: Activity,
-    },
-    {
-      title: "Game Manager",
-      href: "/game-manager",
-      icon: Gamepad2,
-    },
-    {
-      title: "Memory Manager",
-      href: "/memory-manager",
-      icon: MemoryStick,
-    },
-    {
-      title: "Message Manager",
-      href: "/messages",
-      icon: MessageSquare,
-    },
-    {
-      title: "Device Manager",
-      href: "/device-manager",
-      icon: CpuIcon,
-    },
-    {
-      title: "WLED Profiles",
-      href: "/wled-profiles",
-      icon: MemoryStick,
-    },
-    {
-      title: "Log",
-      href: "/log",
-      icon: FileText,
-    },
+  const navItems = [
+    { name: "Dashboard", path: "/" },
+    { name: "Memory Manager", path: "/memory-manager" },
+    { name: "Game Profiles", path: "/game-profiles" },
+    { name: "Message Monitor", path: "/message-monitor" },
+    { name: "Device Manager", path: "/device-manager" },
+    { name: "WLED Manager", path: "/wled-manager" },
+    { name: "Community", path: "/community-profiles" },
   ];
 
   return (
@@ -140,13 +111,13 @@ export function MainNav() {
         </div>
         <NavigationMenu className="flex-1">
           <NavigationMenuList>
-            {routes.map((route) => {
-              const isActive = isActiveRoute(route.href);
+            {navItems.map((item) => {
+              const isActive = isActiveRoute(item.path);
               return (
-                <NavigationMenuItem key={route.href}>
+                <NavigationMenuItem key={item.path}>
                   <NavigationMenuLink asChild>
                     <Link 
-                      to={route.href}
+                      to={item.path}
                       className={cn(
                         "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-0 disabled:pointer-events-none disabled:opacity-50",
                         isActive 
@@ -154,8 +125,8 @@ export function MainNav() {
                           : navigationMenuTriggerStyle()
                       )}
                     >
-                      <route.icon className="mr-2 h-4 w-4" />
-                      {route.title}
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.name}
                     </Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
